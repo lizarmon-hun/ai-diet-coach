@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, User, Activity, Target, Flame, Info } from 'lucide-react';
 import { UserProfile, ActivityLevel } from '@/types/diet';
 import { calculateBMR, calculateTDEE } from '@/lib/calculator';
@@ -19,29 +19,52 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   onSave,
 }) => {
   const [gender, setGender] = useState<'male' | 'female'>(profile.gender);
-  const [age, setAge] = useState<number>(profile.age);
-  const [height, setHeight] = useState<number>(profile.height);
-  const [weight, setWeight] = useState<number>(profile.weight);
-  const [targetWeight, setTargetWeight] = useState<number>(profile.targetWeight);
+  const [age, setAge] = useState<string | number>(profile.age);
+  const [height, setHeight] = useState<string | number>(profile.height);
+  const [weight, setWeight] = useState<string | number>(profile.weight);
+  const [targetWeight, setTargetWeight] = useState<string | number>(profile.targetWeight);
   const [activityLevel, setActivityLevel] = useState<ActivityLevel>(profile.activityLevel);
+
+  useEffect(() => {
+    if (isOpen) {
+      setGender(profile.gender);
+      setAge(profile.age);
+      setHeight(profile.height);
+      setWeight(profile.weight);
+      setTargetWeight(profile.targetWeight);
+      setActivityLevel(profile.activityLevel);
+    }
+  }, [isOpen, profile]);
 
   if (!isOpen) return null;
 
-  const currentBmr = calculateBMR(gender, weight, height, age);
+  const numAge = Number(age) > 0 ? Number(age) : profile.age;
+  const numHeight = Number(height) > 0 ? Number(height) : profile.height;
+  const numWeight = Number(weight) > 0 ? Number(weight) : profile.weight;
+  const numTargetWeight = Number(targetWeight) > 0 ? Number(targetWeight) : profile.targetWeight;
+
+  const currentBmr = calculateBMR(gender, numWeight, numHeight, numAge);
   const currentTdee = calculateTDEE(currentBmr, activityLevel);
-  const weightDiff = weight - targetWeight;
+  const weightDiff = numWeight - numTargetWeight;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const finalAge = Math.max(10, Math.min(120, Number(age) || profile.age));
+    const finalHeight = Math.max(50, Math.min(250, Number(height) || profile.height));
+    const finalWeight = Math.max(20, Math.min(300, Number(weight) || profile.weight));
+    const finalTargetWeight = Math.max(20, Math.min(300, Number(targetWeight) || profile.targetWeight));
+    const finalBmr = calculateBMR(gender, finalWeight, finalHeight, finalAge);
+    const finalTdee = calculateTDEE(finalBmr, activityLevel);
+
     const updated: UserProfile = {
       gender,
-      age: Number(age),
-      height: Number(height),
-      weight: Number(weight),
-      targetWeight: Number(targetWeight),
+      age: finalAge,
+      height: finalHeight,
+      weight: finalWeight,
+      targetWeight: finalTargetWeight,
       activityLevel,
-      bmr: currentBmr,
-      tdee: currentTdee,
+      bmr: finalBmr,
+      tdee: finalTdee,
     };
     onSave(updated);
     onClose();
@@ -133,10 +156,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               <div className="relative">
                 <input
                   type="number"
-                  min="10"
-                  max="100"
+                  placeholder="28"
                   value={age}
-                  onChange={(e) => setAge(Math.max(1, Number(e.target.value)))}
+                  onChange={(e) => setAge(e.target.value)}
+                  onBlur={() => {
+                    if (age === '' || Number(age) < 10) setAge(10);
+                    else if (Number(age) > 120) setAge(120);
+                  }}
                   className="w-full px-3 py-2 border rounded-xl border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                 />
                 <span className="absolute right-3 top-2.5 text-xs text-zinc-400">세</span>
@@ -148,10 +174,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               <div className="relative">
                 <input
                   type="number"
-                  min="100"
-                  max="250"
+                  placeholder="175"
                   value={height}
-                  onChange={(e) => setHeight(Math.max(50, Number(e.target.value)))}
+                  onChange={(e) => setHeight(e.target.value)}
+                  onBlur={() => {
+                    if (height === '' || Number(height) < 50) setHeight(50);
+                    else if (Number(height) > 250) setHeight(250);
+                  }}
                   className="w-full px-3 py-2 border rounded-xl border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                 />
                 <span className="absolute right-3 top-2.5 text-xs text-zinc-400">cm</span>
@@ -164,10 +193,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 <input
                   type="number"
                   step="0.1"
-                  min="30"
-                  max="250"
+                  placeholder="70"
                   value={weight}
-                  onChange={(e) => setWeight(Math.max(20, Number(e.target.value)))}
+                  onChange={(e) => setWeight(e.target.value)}
+                  onBlur={() => {
+                    if (weight === '' || Number(weight) < 20) setWeight(20);
+                    else if (Number(weight) > 300) setWeight(300);
+                  }}
                   className="w-full px-3 py-2 border rounded-xl border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                 />
                 <span className="absolute right-3 top-2.5 text-xs text-zinc-400">kg</span>
@@ -190,10 +222,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               <input
                 type="number"
                 step="0.1"
-                min="30"
-                max="250"
+                placeholder="65"
                 value={targetWeight}
-                onChange={(e) => setTargetWeight(Math.max(20, Number(e.target.value)))}
+                onChange={(e) => setTargetWeight(e.target.value)}
+                onBlur={() => {
+                  if (targetWeight === '' || Number(targetWeight) < 20) setTargetWeight(20);
+                  else if (Number(targetWeight) > 300) setTargetWeight(300);
+                }}
                 className="w-full px-3 py-2 border rounded-xl border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               />
               <span className="absolute right-3 top-2.5 text-xs text-zinc-400">kg</span>

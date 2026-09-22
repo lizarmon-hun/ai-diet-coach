@@ -40,16 +40,17 @@ export const WorkoutModal: React.FC<WorkoutModalProps> = ({
 }) => {
   const [exerciseName, setExerciseName] = useState('웨이트 트레이닝(헬스)');
   const [category, setCategory] = useState<ExerciseCategory>('strength');
-  const [durationMinutes, setDurationMinutes] = useState(45);
+  const [durationMinutes, setDurationMinutes] = useState<string | number>(45);
   const [intensity, setIntensity] = useState<ExerciseIntensity>('moderate');
-  const [caloriesBurned, setCaloriesBurned] = useState(300);
+  const [caloriesBurned, setCaloriesBurned] = useState<string | number>(300);
   const [notes, setNotes] = useState('');
 
   // Auto calculate burned calories when exercise, duration, or intensity changes
   useEffect(() => {
+    const numDuration = Number(durationMinutes) > 0 ? Number(durationMinutes) : 30;
     const calculated = calculateExerciseCalories(
       exerciseName,
-      durationMinutes,
+      numDuration,
       intensity,
       profile.weight || 70
     );
@@ -237,7 +238,7 @@ export const WorkoutModal: React.FC<WorkoutModalProps> = ({
                 min="0"
                 max="3000"
                 value={caloriesBurned}
-                onChange={(e) => setCaloriesBurned(Number(e.target.value))}
+                onChange={(e) => setCaloriesBurned(e.target.value)}
                 className="w-24 text-right px-2 py-1 bg-white dark:bg-zinc-800 border rounded-lg font-extrabold text-lg text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700 focus:outline-none"
               />
               <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">kcal</span>

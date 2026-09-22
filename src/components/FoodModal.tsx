@@ -66,11 +66,11 @@ export const FoodModal: React.FC<FoodModalProps> = ({
   const [mealType, setMealType] = useState<MealType>('lunch');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [foodName, setFoodName] = useState('');
-  const [calories, setCalories] = useState<number>(450);
-  const [carbs, setCarbs] = useState<number>(50);
-  const [protein, setProtein] = useState<number>(30);
-  const [fat, setFat] = useState<number>(14);
-  const [fiber, setFiber] = useState<number>(4);
+  const [calories, setCalories] = useState<string | number>(450);
+  const [carbs, setCarbs] = useState<string | number>(50);
+  const [protein, setProtein] = useState<string | number>(30);
+  const [fat, setFat] = useState<string | number>(14);
+  const [fiber, setFiber] = useState<string | number>(4);
   const [aiComment, setAiComment] = useState('');
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -346,10 +346,9 @@ export const FoodModal: React.FC<FoodModalProps> = ({
               <div className="relative">
                 <input
                   type="number"
-                  min="0"
-                  max="5000"
+                  placeholder="0"
                   value={calories}
-                  onChange={(e) => setCalories(Number(e.target.value))}
+                  onChange={(e) => setCalories(e.target.value)}
                   className="w-full px-3 py-2 border rounded-xl border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-bold text-orange-600 dark:text-orange-400 focus:ring-2 focus:ring-orange-500 focus:outline-none"
                 />
                 <span className="absolute right-2.5 top-2.5 text-xs text-zinc-400">kcal</span>
@@ -368,9 +367,9 @@ export const FoodModal: React.FC<FoodModalProps> = ({
                 <div className="flex items-center">
                   <input
                     type="number"
-                    min="0"
+                    placeholder="0"
                     value={carbs}
-                    onChange={(e) => setCarbs(Number(e.target.value))}
+                    onChange={(e) => setCarbs(e.target.value)}
                     className="w-full bg-transparent font-bold text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none"
                   />
                   <span className="text-xs text-zinc-400">g</span>
@@ -382,9 +381,9 @@ export const FoodModal: React.FC<FoodModalProps> = ({
                 <div className="flex items-center">
                   <input
                     type="number"
-                    min="0"
+                    placeholder="0"
                     value={protein}
-                    onChange={(e) => setProtein(Number(e.target.value))}
+                    onChange={(e) => setProtein(e.target.value)}
                     className="w-full bg-transparent font-bold text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none"
                   />
                   <span className="text-xs text-zinc-400">g</span>
@@ -396,9 +395,9 @@ export const FoodModal: React.FC<FoodModalProps> = ({
                 <div className="flex items-center">
                   <input
                     type="number"
-                    min="0"
+                    placeholder="0"
                     value={fat}
-                    onChange={(e) => setFat(Number(e.target.value))}
+                    onChange={(e) => setFat(e.target.value)}
                     className="w-full bg-transparent font-bold text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none"
                   />
                   <span className="text-xs text-zinc-400">g</span>
@@ -410,9 +409,9 @@ export const FoodModal: React.FC<FoodModalProps> = ({
                 <div className="flex items-center">
                   <input
                     type="number"
-                    min="0"
+                    placeholder="0"
                     value={fiber}
-                    onChange={(e) => setFiber(Number(e.target.value))}
+                    onChange={(e) => setFiber(e.target.value)}
                     className="w-full bg-transparent font-bold text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none"
                   />
                   <span className="text-xs text-zinc-400">g</span>
