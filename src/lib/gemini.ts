@@ -153,3 +153,98 @@ ${JSON.stringify(data, null, 2)}
   throw lastError || new Error('코칭 피드백 생성 실패');
 }
 
+export interface WorkoutAnalysisResult {
+  exerciseName: string;
+  category: 'cardio' | 'strength' | 'sports' | 'flexibility';
+  durationMinutes: number;
+  intensity: 'light' | 'moderate' | 'vigorous';
+  estimatedMet: number;
+  caloriesBurned: number;
+  aiComment: string;
+}
+
+// 사용자가 자유롭게 입력한 운동 텍스트를 분석하여 종목, 시간, 강도, 소모 칼로리 산출
+export async function analyzeWorkoutWithGemini(params: {
+  userInput: string;
+  weightKg: number;
+  currentDuration?: number;
+  currentIntensity?: string;
+}): Promise<WorkoutAnalysisResult> {
+  const ai = getGeminiClient();
+  if (!ai) {
+    throw new Error('GEMINI_API_KEY 가 설정되지 않았습니다.');
+  }
+
+  const { userInput, weightKg, currentDuration, currentIntensity } = params;
+
+  const prompt = `당신은 전문 운동생리학자 및 퍼스널 피트니스 트레이너 AI입니다.
+사용자가 자유롭게 입력한 운동 설명(텍스트 또는 자연어)을 분석하여 정확한 운동 종목명, 카테고리, 시간(분), 운동 강도, 과학적 MET(대사당량) 수치, 그리고 체중 기반 소모 칼로리를 계산해주세요.
+
+사용자 입력 정보:
+- 운동 설명: "${userInput}"
+- 사용자 체중: ${weightKg || 70} kg
+- 현재 설정된 시간(힌트): ${currentDuration || 30} 분
+- 현재 설정된 강도(힌트): ${currentIntensity || 'moderate'}
+
+계산 지침:
+1. 사용자가 텍스트에 시간(예: "40분", "1시간 30분", "3게임", "5세트")을 언급했다면 이를 분(minutes) 단위 정수로 변환하세요. 언급이 없다면 현재 설정된 시간 또는 해당 운동의 표준 시간을 적용하세요.
+2. 공인된 MET(대사당량) 데이터베이스(Ainsworth Compendium of Physical Activities) 기준을 적용하세요.
+3. 소모 칼로리 공식: \`소모 칼로리 = MET × 체중(kg) × (시간(분) / 60) × 강도배율\`
+   - 강도 배율: light=0.85, moderate=1.0, vigorous=1.25
+4. 카테고리는 반드시 다음 4개 중 하나만 선택: "cardio" (유산소), "strength" (근력/무산소), "sports" (스포츠/구기), "flexibility" (스트레칭/요가)
+5. 강도는 반드시 "light", "moderate", "vigorous" 중 하나만 선택
+
+반드시 다음 JSON 형식으로만 응답하세요. 마크다운(\`\`\`json) 없이 순수 JSON만 반환하세요:
+{
+  "exerciseName": "간결하고 명확한 운동 이름 (예: 주짓수 스파링, 계단 오르기 30층, 볼더링 클라이밍 등)",
+  "category": "cardio",
+  "durationMinutes": 40,
+  "intensity": "moderate",
+  "estimatedMet": 8.0,
+  "caloriesBurned": 373,
+  "aiComment": "이 운동의 효과 및 다이어트/건강 관점에서의 전문 피드백 (1~2문장)"
+}`;
+
+  let lastError: unknown = null;
+  for (const model of GEMINI_MODELS) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          temperature: 0.2,
+        },
+      });
+
+      const text = response.text || '{}';
+      const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
+      const parsed = JSON.parse(cleanJson);
+
+      const duration = Number(parsed.durationMinutes) || currentDuration || 30;
+      const met = Number(parsed.estimatedMet) || 6.0;
+      const intensity = (['light', 'moderate', 'vigorous'].includes(parsed.intensity) ? parsed.intensity : (currentIntensity || 'moderate')) as 'light' | 'moderate' | 'vigorous';
+      
+      // Fallback calculation if LLM missed it
+      const intensityFactor = intensity === 'light' ? 0.85 : intensity === 'vigorous' ? 1.25 : 1.0;
+      const calculatedCalories = Math.round(met * (weightKg || 70) * (duration / 60) * intensityFactor);
+
+      return {
+        exerciseName: parsed.exerciseName || userInput.trim(),
+        category: (['cardio', 'strength', 'sports', 'flexibility'].includes(parsed.category) ? parsed.category : 'cardio') as WorkoutAnalysisResult['category'],
+        durationMinutes: duration,
+        intensity,
+        estimatedMet: met,
+        caloriesBurned: Number(parsed.caloriesBurned) || calculatedCalories,
+        aiComment: parsed.aiComment || '훌륭한 운동 루틴입니다! 꾸준히 유지해보세요.',
+      };
+    } catch (err) {
+      console.warn(`[analyzeWorkoutWithGemini] Model ${model} failed, trying fallback:`, err);
+      lastError = err;
+    }
+  }
+
+  throw lastError || new Error('운동 분석에 실패했습니다.');
+}
+
+

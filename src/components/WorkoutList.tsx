@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Dumbbell, Trash2, Plus, Flame, Clock } from 'lucide-react';
+import { Dumbbell, Trash2, Plus, Flame, Clock, Sparkles } from 'lucide-react';
 import { WorkoutRecord } from '@/types/diet';
 
 interface WorkoutListProps {
@@ -114,6 +114,13 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
                         </>
                       )}
                     </div>
+
+                    {workout.aiComment && (
+                      <p className="text-[11px] text-zinc-500 dark:text-zinc-400 italic line-clamp-1 flex items-center gap-1 mt-1">
+                        <Sparkles className="w-3 h-3 text-blue-500 shrink-0" />
+                        {workout.aiComment}
+                      </p>
+                    )}
                   </div>
                 </div>
 

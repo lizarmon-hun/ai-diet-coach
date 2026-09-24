@@ -40,6 +40,7 @@ export interface WorkoutRecord {
   intensity: ExerciseIntensity;
   caloriesBurned: number; // kcal
   notes?: string;
+  aiComment?: string;
   createdAt: string;
 }
 
