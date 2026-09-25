@@ -30,7 +30,7 @@ export const CalorieBalanceCard: React.FC<CalorieBalanceCardProps> = ({
       {/* Title & Status Badge */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 block">Today's Calorie Balance</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 block">Today&apos;s Calorie Balance</span>
           <h3 className="text-lg font-extrabold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
             오늘의 칼로리 수지 분석
           </h3>
