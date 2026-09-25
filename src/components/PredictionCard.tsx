@@ -8,7 +8,6 @@ import {
   Award,
   CheckCircle,
   AlertCircle,
-  ArrowRight,
   Loader2,
   CalendarCheck,
   Target,

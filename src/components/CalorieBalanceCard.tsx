@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Flame, Utensils, Dumbbell, TrendingDown, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Flame, Utensils, TrendingDown, TrendingUp, AlertTriangle } from 'lucide-react';
 import { DietPrediction, UserProfile } from '@/types/diet';
 
 interface CalorieBalanceCardProps {
@@ -13,7 +13,7 @@ export const CalorieBalanceCard: React.FC<CalorieBalanceCardProps> = ({
   prediction,
   profile,
 }) => {
-  const { totalIntake, workoutBurn, tdee, netCalories, calorieDeficit, macros } = prediction;
+  const { totalIntake, workoutBurn, tdee, calorieDeficit, macros } = prediction;
   const totalBurn = tdee + workoutBurn;
 
   // Deficit status

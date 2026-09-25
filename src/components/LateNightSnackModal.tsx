@@ -15,7 +15,6 @@ import {
   ShieldAlert,
   Coffee,
   Activity,
-  Zap,
 } from 'lucide-react';
 import { LateNightSnackPrediction } from '@/types/lateSnack';
 
@@ -477,7 +476,7 @@ export const LateNightSnackModal: React.FC<LateNightSnackModalProps> = ({
                   </button>
                 </div>
                 <div className="p-3 bg-white/95 dark:bg-zinc-800/90 rounded-xl border border-amber-200/60 dark:border-amber-900/40 text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed font-medium">
-                  "{prediction.filialMessage}"
+                  &ldquo;{prediction.filialMessage}&rdquo;
                 </div>
                 <p className="text-[11px] text-amber-800/80 dark:text-amber-400">
                   💡 자식이 건강을 진심으로 걱정하는 말투로 구성되어 있어, 아버지가 거부감 없이 야식을 멈추실 수 있습니다.

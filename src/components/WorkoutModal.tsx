@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X, Dumbbell, Flame, Clock, Zap, Sparkles, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { WorkoutRecord, ExerciseCategory, ExerciseIntensity, UserProfile } from '@/types/diet';
 import { calculateExerciseCalories } from '@/lib/calculator';
@@ -68,18 +68,16 @@ export const WorkoutModal: React.FC<WorkoutModalProps> = ({
   // Flag to check if current calories were set by AI
   const [isAiCalculated, setIsAiCalculated] = useState(false);
 
-  // Auto calculate burned calories if user changes preset/slider manually (and wasn't just set by AI)
-  useEffect(() => {
-    if (isAiCalculated) return;
-    const numDuration = Number(durationMinutes) > 0 ? Number(durationMinutes) : 30;
+  const recalculateManualCalories = (name: string, duration: string | number, intens: ExerciseIntensity) => {
+    const numDuration = Number(duration) > 0 ? Number(duration) : 30;
     const calculated = calculateExerciseCalories(
-      exerciseName,
+      name,
       numDuration,
-      intensity,
+      intens,
       profile.weight || 70
     );
     setCaloriesBurned(calculated);
-  }, [exerciseName, durationMinutes, intensity, profile.weight, isAiCalculated]);
+  };
 
   if (!isOpen) return null;
 
@@ -92,6 +90,7 @@ export const WorkoutModal: React.FC<WorkoutModalProps> = ({
     setCategory(preset.category);
     setDurationMinutes(preset.defaultDuration);
     setIntensity(preset.intensity);
+    recalculateManualCalories(preset.name, preset.defaultDuration, preset.intensity);
   };
 
   const handleAIAnalyze = async (textToAnalyze?: string) => {
@@ -326,8 +325,10 @@ export const WorkoutModal: React.FC<WorkoutModalProps> = ({
                 placeholder="예: 러닝, 벤치프레스, 필라테스"
                 value={exerciseName}
                 onChange={(e) => {
-                  setExerciseName(e.target.value);
+                  const val = e.target.value;
+                  setExerciseName(val);
                   setIsAiCalculated(false);
+                  recalculateManualCalories(val, durationMinutes, intensity);
                 }}
                 className="w-full px-3 py-2 border rounded-xl border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
@@ -360,8 +361,10 @@ export const WorkoutModal: React.FC<WorkoutModalProps> = ({
                   placeholder="30"
                   value={durationMinutes}
                   onChange={(e) => {
-                    setDurationMinutes(e.target.value);
+                    const val = e.target.value;
+                    setDurationMinutes(val);
                     setIsAiCalculated(false);
+                    recalculateManualCalories(exerciseName, val, intensity);
                   }}
                   className="w-16 text-right px-2 py-0.5 border rounded-lg border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-bold text-blue-600 focus:outline-none"
                 />
@@ -375,8 +378,10 @@ export const WorkoutModal: React.FC<WorkoutModalProps> = ({
               step="5"
               value={Number(durationMinutes) || 30}
               onChange={(e) => {
-                setDurationMinutes(Number(e.target.value));
+                const val = Number(e.target.value);
+                setDurationMinutes(val);
                 setIsAiCalculated(false);
+                recalculateManualCalories(exerciseName, val, intensity);
               }}
               className="w-full accent-blue-600 cursor-pointer"
             />
@@ -405,8 +410,10 @@ export const WorkoutModal: React.FC<WorkoutModalProps> = ({
                   key={item.id}
                   type="button"
                   onClick={() => {
-                    setIntensity(item.id as ExerciseIntensity);
+                    const newIntensity = item.id as ExerciseIntensity;
+                    setIntensity(newIntensity);
                     setIsAiCalculated(false);
+                    recalculateManualCalories(exerciseName, durationMinutes, newIntensity);
                   }}
                   className={`p-2.5 rounded-xl border text-left transition ${
                     intensity === item.id

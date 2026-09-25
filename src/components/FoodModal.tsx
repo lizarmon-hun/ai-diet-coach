@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { X, Camera, Upload, Sparkles, Loader2, CheckCircle2, AlertCircle, Utensils } from 'lucide-react';
+import { X, Camera, Sparkles, Loader2, CheckCircle2, AlertCircle, Utensils } from 'lucide-react';
 import { MealRecord, MealType } from '@/types/diet';
 
 interface FoodModalProps {
@@ -236,6 +236,7 @@ export const FoodModal: React.FC<FoodModalProps> = ({
 
             {imagePreview ? (
               <div className="relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 group">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={imagePreview}
                   alt="음식 미리보기"

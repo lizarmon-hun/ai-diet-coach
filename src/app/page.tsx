@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import { Header } from '@/components/Header';
 import { ProfileModal } from '@/components/ProfileModal';
 import { FoodModal } from '@/components/FoodModal';
@@ -22,36 +22,30 @@ import {
   deleteWorkoutFromDay,
   saveDayLog,
 } from '@/lib/storage';
-import { getDefaultProfile, computeDietPrediction } from '@/lib/calculator';
-import { Flame, Sparkles, Utensils, Dumbbell, Target, Moon } from 'lucide-react';
+import { computeDietPrediction } from '@/lib/calculator';
+import { Flame, Sparkles, Utensils, Dumbbell, Moon } from 'lucide-react';
+
+const emptySubscribe = () => () => {};
 
 export default function Home() {
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [profile, setProfile] = useState<UserProfile>(getDefaultProfile());
-  const [dayLog, setDayLog] = useState<DayLog>({
-    date: '',
-    meals: [],
-    workouts: [],
-    prediction: computeDietPrediction(getDefaultProfile(), [], []),
+  const isClient = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+  const [selectedDate, setSelectedDate] = useState<string>(() => getTodayDateString());
+  const [profile, setProfile] = useState<UserProfile>(() => loadUserProfile());
+  const [dayLog, setDayLog] = useState<DayLog>(() => {
+    const today = getTodayDateString();
+    const prof = loadUserProfile();
+    return getDayLog(today, prof);
   });
-  const [isClient, setIsClient] = useState(false);
 
   // Modals
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isFoodOpen, setIsFoodOpen] = useState(false);
   const [isWorkoutOpen, setIsWorkoutOpen] = useState(false);
   const [isLateSnackOpen, setIsLateSnackOpen] = useState(false);
-
-  // Initialize on client
-  useEffect(() => {
-    setIsClient(true);
-    const today = getTodayDateString();
-    setSelectedDate(today);
-    const loadedProfile = loadUserProfile();
-    setProfile(loadedProfile);
-    const loadedLog = getDayLog(today, loadedProfile);
-    setDayLog(loadedLog);
-  }, []);
 
   // When date changes
   const handleDateChange = (newDate: string) => {
@@ -125,7 +119,6 @@ export default function Home() {
   }
 
   const prediction = dayLog.prediction || computeDietPrediction(profile, dayLog.meals, dayLog.workouts);
-  const remainingWeight = (profile.weight - profile.targetWeight).toFixed(1);
 
   return (
     <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50">
@@ -189,7 +182,7 @@ export default function Home() {
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-extrabold text-sm sm:text-base text-zinc-900 dark:text-zinc-100">
-                  밤에 자꾸 뭘 드시려는 아버지를 위한 "야식 건강 예측기"
+                  밤에 자꾸 뭘 드시려는 아버지를 위한 &ldquo;야식 건강 예측기&rdquo;
                 </h3>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold border border-purple-200 dark:border-purple-800">
                   효도 케어

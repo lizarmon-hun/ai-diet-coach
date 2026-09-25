@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X, User, Activity, Target, Flame, Info } from 'lucide-react';
 import { UserProfile, ActivityLevel } from '@/types/diet';
 import { calculateBMR, calculateTDEE } from '@/lib/calculator';
@@ -18,25 +18,22 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   profile,
   onSave,
 }) => {
+  if (!isOpen) return null;
+
+  return <ProfileModalContent onClose={onClose} profile={profile} onSave={onSave} />;
+};
+
+const ProfileModalContent: React.FC<Omit<ProfileModalProps, 'isOpen'>> = ({
+  onClose,
+  profile,
+  onSave,
+}) => {
   const [gender, setGender] = useState<'male' | 'female'>(profile.gender);
   const [age, setAge] = useState<string | number>(profile.age);
   const [height, setHeight] = useState<string | number>(profile.height);
   const [weight, setWeight] = useState<string | number>(profile.weight);
   const [targetWeight, setTargetWeight] = useState<string | number>(profile.targetWeight);
   const [activityLevel, setActivityLevel] = useState<ActivityLevel>(profile.activityLevel);
-
-  useEffect(() => {
-    if (isOpen) {
-      setGender(profile.gender);
-      setAge(profile.age);
-      setHeight(profile.height);
-      setWeight(profile.weight);
-      setTargetWeight(profile.targetWeight);
-      setActivityLevel(profile.activityLevel);
-    }
-  }, [isOpen, profile]);
-
-  if (!isOpen) return null;
 
   const numAge = Number(age) > 0 ? Number(age) : profile.age;
   const numHeight = Number(height) > 0 ? Number(height) : profile.height;

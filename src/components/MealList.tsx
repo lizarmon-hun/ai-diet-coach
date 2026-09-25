@@ -83,6 +83,7 @@ export const MealList: React.FC<MealListProps> = ({
               >
                 {/* Photo Thumbnail */}
                 {meal.photoUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     src={meal.photoUrl}
                     alt={meal.foodName}
