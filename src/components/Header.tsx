@@ -1,13 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Calendar, ChevronLeft, ChevronRight, Settings, Flame, Sparkles } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Settings, Flame, Moon } from 'lucide-react';
 import { UserProfile } from '@/types/diet';
 
 interface HeaderProps {
   selectedDate: string;
   onDateChange: (date: string) => void;
   onOpenProfile: () => void;
+  onOpenLateSnack?: () => void;
   profile: UserProfile;
 }
 
@@ -15,6 +16,7 @@ export const Header: React.FC<HeaderProps> = ({
   selectedDate,
   onDateChange,
   onOpenProfile,
+  onOpenLateSnack,
   profile,
 }) => {
   const handlePrevDay = () => {
@@ -93,9 +95,23 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Profile & Target Pill */}
-        <button
-          onClick={onOpenProfile}
+        <div className="flex items-center gap-2">
+          {/* Father's Late-Night Snack Button */}
+          {onOpenLateSnack && (
+            <button
+              onClick={onOpenLateSnack}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-purple-200 dark:border-purple-800/80 hover:border-purple-400 bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 hover:shadow-sm transition-all text-xs font-bold"
+              title="아버지를 위한 심야 야식 건강 예측기"
+            >
+              <Moon className="w-3.5 h-3.5 fill-purple-600 text-purple-600 dark:fill-purple-400 dark:text-purple-400" />
+              <span className="hidden sm:inline">야식 예측 (아버지 케어)</span>
+              <span className="sm:hidden">야식</span>
+            </button>
+          )}
+
+          {/* Profile & Target Pill */}
+          <button
+            onClick={onOpenProfile}
           className="flex items-center gap-2 pl-3 pr-3.5 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:border-emerald-400 dark:hover:border-emerald-600 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:shadow-sm transition-all text-xs sm:text-sm font-medium"
         >
           <Settings className="w-4 h-4 text-zinc-500" />
@@ -106,6 +122,7 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </div>
         </button>
+        </div>
       </div>
     </header>
   );

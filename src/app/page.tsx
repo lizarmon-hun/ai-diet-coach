@@ -9,6 +9,7 @@ import { CalorieBalanceCard } from '@/components/CalorieBalanceCard';
 import { PredictionCard } from '@/components/PredictionCard';
 import { MealList } from '@/components/MealList';
 import { WorkoutList } from '@/components/WorkoutList';
+import { LateNightSnackModal } from '@/components/LateNightSnackModal';
 import { UserProfile, DayLog, MealRecord, WorkoutRecord, DietPrediction } from '@/types/diet';
 import {
   getTodayDateString,
@@ -22,7 +23,7 @@ import {
   saveDayLog,
 } from '@/lib/storage';
 import { getDefaultProfile, computeDietPrediction } from '@/lib/calculator';
-import { Flame, Sparkles, Utensils, Dumbbell, Target } from 'lucide-react';
+import { Flame, Sparkles, Utensils, Dumbbell, Target, Moon } from 'lucide-react';
 
 export default function Home() {
   const [selectedDate, setSelectedDate] = useState<string>('');
@@ -39,6 +40,7 @@ export default function Home() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isFoodOpen, setIsFoodOpen] = useState(false);
   const [isWorkoutOpen, setIsWorkoutOpen] = useState(false);
+  const [isLateSnackOpen, setIsLateSnackOpen] = useState(false);
 
   // Initialize on client
   useEffect(() => {
@@ -132,6 +134,7 @@ export default function Home() {
         selectedDate={selectedDate}
         onDateChange={handleDateChange}
         onOpenProfile={() => setIsProfileOpen(true)}
+        onOpenLateSnack={() => setIsLateSnackOpen(true)}
         profile={profile}
       />
 
@@ -175,6 +178,35 @@ export default function Home() {
 
           {/* Decorative background glow */}
           <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+        </div>
+
+        {/* Father's Midnight Snack Guardian Banner */}
+        <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-pink-950/20 border border-purple-200/80 dark:border-purple-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/20">
+              <Moon className="w-6 h-6 fill-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-extrabold text-sm sm:text-base text-zinc-900 dark:text-zinc-100">
+                  밤에 자꾸 뭘 드시려는 아버지를 위한 "야식 건강 예측기"
+                </h3>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold border border-purple-200 dark:border-purple-800">
+                  효도 케어
+                </span>
+              </div>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                시간과 야식 메뉴를 넣으면 수면의 질, 역류성 식도염, 혈당 영향을 예측하고 속 편한 대체 간식과 다정한 카톡 설득 문구를 드립니다.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsLateSnackOpen(true)}
+            className="px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-indigo-600/20 flex items-center justify-center gap-1.5 shrink-0 transition transform hover:-translate-y-0.5"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>야식 건강 시뮬레이션</span>
+          </button>
         </div>
 
         {/* 1. Core AI Prediction Engine Card */}
@@ -233,6 +265,11 @@ export default function Home() {
         selectedDate={selectedDate}
         profile={profile}
         onSaveWorkout={handleSaveWorkout}
+      />
+
+      <LateNightSnackModal
+        isOpen={isLateSnackOpen}
+        onClose={() => setIsLateSnackOpen(false)}
       />
     </div>
   );
